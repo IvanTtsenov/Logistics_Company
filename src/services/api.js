@@ -9,8 +9,9 @@ export async function register(data) {
     });
 
     if (!response.ok) {
-        const text = await response.text();
-        throw new Error(text || "Регистрацията е неуспешна");
+        const body = await response.json();
+        throw new Error(body.message);
+    }else {
+        alert("SUCCESS");
     }
-    alert("SUCCESS");
 }
