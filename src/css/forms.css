@@ -1,1 +1,67 @@
-/* Стилове за формите */
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f1f5f9;
+    color: #0f172a;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    width: 360px;
+    padding: 32px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.register-form h2 {
+    margin: 0 0 8px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.register-form label {
+    margin-top: 16px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.register-form input {
+    padding: 10px 12px;
+    font-size: 15px;
+    color: #0f172a;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.register-form input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.register-form button {
+    margin-top: 24px;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    background: #2563eb;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.register-form button:hover {
+    background: #1d4ed8;
+}
