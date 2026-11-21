@@ -9,11 +9,12 @@ export async function register(data) {
     });
 
     if (!response.ok) {
-        const body = await response.json();
-        throw new Error(body.message);
-    }else {
-        alert("SUCCESS");
+        // const body = await response.json();
+        // throw new Error(body.message);
+          throw new Error(await readError(response, "Входът не беше успешен."));
     }
+        const body = await response.json();
+        console.log(body)
 }
 
 
@@ -25,9 +26,9 @@ export async function login(credentials) {
     });
 
     if (!response.ok) {
-        if (response.status === 401) {
-            throw new Error("Неправилен имейл или парола.");
-        }
+        // if (response.status === 401) {
+        //     throw new Error("Неправилен имейл или парола.");
+        // }
         throw new Error(await readError(response, "Входът не беше успешен."));
     }
 

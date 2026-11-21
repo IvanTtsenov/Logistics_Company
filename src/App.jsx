@@ -1,36 +1,33 @@
-
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, Outlet, useNavigate, useLocation } from 'react-router';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import NotFound from './pages/NotFound.jsx';
 import { getCurrentUser } from './services/api.js';
 import { clearAuthSession, readAuthSession, saveAuthSession } from './services/authService.js';
 
-const ALLOWED_PAGES = new Set(['/', '/login', '/register', '/dashboard']);
+// /login and /register: only for logged-out users
+function LoggedOut({ session }) {
+    return session ? <Navigate to="/dashboard" replace /> : <Outlet />;
+}
 
-function currentPath() {
-    return ALLOWED_PAGES.has(window.location.pathname) ? window.location.pathname : '/';
+// /dashboard: only for logged-in users
+function LoggedIn({ session, checking }) {
+    if (checking) {
+        return <div className="app-loading" role="status">Проверка на сесията...</div>;
+    }
+    return session ? <Outlet /> : <Navigate to="/login" replace />;
 }
 
 function App() {
-    const [path, setPath] = useState(currentPath);
+    const { pathname } = useLocation();
+    useEffect(() => window.scrollTo(0, 0), [pathname]);
+
+    const navigate = useNavigate();
     const [session, setSession] = useState(readAuthSession);
     const [checkingSession, setCheckingSession] = useState(Boolean(readAuthSession()));
-
-    const navigate = useCallback((nextPath) => {
-        if (window.location.pathname !== nextPath) {
-            window.history.pushState(null, '', nextPath);
-        }
-        setPath(nextPath);
-        window.scrollTo({ top: 0, behavior: 'auto' });
-    }, []);
-
-    useEffect(() => {
-        const handleBackForward = () => setPath(currentPath());
-        window.addEventListener('popstate', handleBackForward);
-        return () => window.removeEventListener('popstate', handleBackForward);
-    }, []);
 
     useEffect(() => {
         const stored = readAuthSession();
@@ -38,24 +35,18 @@ function App() {
 
         let active = true;
         getCurrentUser(stored.token)
-            .then((user) => {
-                if (active) setSession({ ...stored, user });
-            })
+            .then((user) => { if (active) setSession({ ...stored, user }); })
             .catch(() => {
                 clearAuthSession();
-                if (active) {
-                    setSession(null);
-                    if (currentPath() === '/dashboard') navigate('/login');
-                }
+                if (active) setSession(null); // <Protected> redirects to /login automatically
             })
             .finally(() => { if (active) setCheckingSession(false); });
 
         return () => { active = false; };
-    }, [navigate]);
+    }, []);
 
     function handleLogin(tokenResponse, user) {
-        const nextSession = saveAuthSession(tokenResponse, user);
-        setSession(nextSession);
+        setSession(saveAuthSession(tokenResponse, user));
         navigate('/dashboard');
     }
 
@@ -64,35 +55,24 @@ function App() {
         setSession(null);
         navigate('/');
     }
+    return (
+        <>
+            <Routes>
+                <Route path="/" element={<Home user={session?.user} onLogout={handleLogout} />} />
 
-    if (checkingSession && path === '/dashboard') {
-        return <div className="app-loading" role="status">Проверка на сесията...</div>;
-    }
+                <Route element={<LoggedOut session={session} />}>
+                    <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                    <Route path="/register" element={<Register />} />
+                </Route>
 
-    if (path === '/register' && !session) {
-        return (
-            <div className="registration-shell">
-                <div className="register-links">
-                    <button type="button" onClick={() => navigate('/')}>← Към началото</button>
-                    <button type="button" onClick={() => navigate('/login')}>Вече имаш профил? Вход</button>
-                </div>
-                <Register />
-            </div>
-        );
-    }
+                <Route element={<LoggedIn session={session} checking={checkingSession} />}>
+                    <Route path="/dashboard" element={<Dashboard user={session?.user} onLogout={handleLogout} />} />
+                </Route>
 
-    if (path === '/login' && !session) {
-        return <Login onLogin={handleLogin} onNavigate={navigate} />;
-    }
-
-    if (path === '/dashboard' || (session && (path === '/login' || path === '/register'))) {
-        if (!session) {
-            return <Login onLogin={handleLogin} onNavigate={navigate} />;
-        }
-        return <Dashboard user={session.user} onLogout={handleLogout} onNavigate={navigate} />;
-    }
-
-    return <Home user={session?.user} onNavigate={navigate} onLogout={handleLogout} />;
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+        </>
+    );
 }
 
 export default App;

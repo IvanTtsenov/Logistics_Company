@@ -66,3 +66,14 @@
 .register-form button:hover {
     background: #1d4ed8;
 }
+
+.register-error {
+    margin-top: 16px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+}

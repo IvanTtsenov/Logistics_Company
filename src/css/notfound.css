@@ -1,0 +1,23 @@
+.not-found {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #0f172a;
+}
+
+.not-found h1 {
+    margin: 0;
+    font-size: 72px;
+    color: #2563eb;
+}
+
+.not-found a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
